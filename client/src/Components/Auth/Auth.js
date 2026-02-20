@@ -1,10 +1,10 @@
 import React, { useState, useContext } from 'react'
-import { useGoogleLogin } from 'react-google-login'
+import { useGoogleLogin } from '@react-oauth/google'
 import { AuthContext } from '../../App' // import authentication context
-import { useHistory, Link } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import Input from '../Input/Input'
 import { signin, signup } from '../../Helpers/AuthActions'
-require('dotenv').config()
+import axios from 'axios'
 
 const Auth = () => {
   const [formData, setFormData] = useState({
@@ -17,8 +17,7 @@ const Auth = () => {
   
   const [signedUp, setSignedUp] = useState(false)
   const { dispatch } = useContext(AuthContext)
-  const history = useHistory()
-  const clientId = process.env.REACT_APP_CLIENT_ID
+  const navigate = useNavigate()
 
   const clearForm = () => {
     setFormData({
@@ -47,46 +46,41 @@ const Auth = () => {
     if(signedUp) {
       signup({
         dispatch,
-        payload: {formData, history}
+        payload: {formData, navigate}
       })
     } else {
       signin({
         dispatch,
-        payload: {formData, history}
+        payload: {formData, navigate}
       })
     }
     clearForm()
   }
 
-  const onSuccess = async googleData => {
-    const resultData = await googleData
-
-    const result = { 
-      firstName: resultData.profileObj.givenName,
-      lastName: resultData.profileObj.familyName,
-      email: resultData.profileObj.email,
-      _id: resultData.profileObj.googleId,
-    }
-
-    const token = resultData.tokenId
-
-    try {
-      dispatch({ type: 'LOGIN', payload: { result, token } })
-
-      history.push(`/`)
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  const onFailure = async () => {
-    console.log("Google Sign In was unsuccessful. Try again later!")
-  }
-
-  const { signIn } = useGoogleLogin({
-    onSuccess: onSuccess,
-    onFailure: onFailure,
-    clientId,
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const userInfoRes = await axios.get(
+          'https://www.googleapis.com/oauth2/v3/userinfo',
+          { headers: { Authorization: `Bearer ${tokenResponse.access_token}` } }
+        )
+        const userInfo = userInfoRes.data
+        const result = {
+          firstName: userInfo.given_name,
+          lastName: userInfo.family_name,
+          email: userInfo.email,
+          _id: userInfo.sub,
+        }
+        const token = tokenResponse.access_token
+        dispatch({ type: 'LOGIN', payload: { result, token } })
+        navigate('/')
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    onError: () => {
+      console.log("Google Sign In was unsuccessful. Try again later!")
+    },
   })
 
   return (
@@ -180,7 +174,7 @@ const Auth = () => {
         {!signedUp && <div className="flex items-center justify-between py-2">
           <button
             className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            onClick={signIn}
+            onClick={() => googleLogin()}
           >
             Login with Google
           </button>

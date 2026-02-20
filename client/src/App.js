@@ -2,7 +2,7 @@ import React, { useReducer } from 'react'
 import Home from './Components/Home/Home';
 import Navbar from './Components/Navbar/Navbar';
 import News from './Components/News/News';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import NotFound from './Components/NotFound/NotFound';
 import Footer from './Components/Footer/Footer';
 import UserNews from './Components/User/UserNews';
@@ -24,14 +24,14 @@ function App() {
 
         <div className="container max-w-full h-screen overflow-auto bg-blue-600">
           <Navbar />
-          <Switch>
-            <Route exact path="/" component={Home} />
-            <Route exact path="/news/:region" component={News} />
-            <Route exact path="/user/:userId" component={UserNews} />
-            <Route exact path="/contact" component={Contact} />
-            <Route exact path="/signin" component={Auth} />
-            <Route path="/*" component={NotFound} />
-          </Switch>
+          <Routes>
+            <Route exact path="/" element={<Home />} />
+            <Route exact path="/news/:region" element={<News />} />
+            <Route exact path="/user/:userId" element={<UserNews />} />
+            <Route exact path="/contact" element={<Contact />} />
+            <Route exact path="/signin" element={<Auth />} />
+            <Route path="/*" element={<NotFound />} />
+          </Routes>
           <Footer />
         </div>
       </AuthContext.Provider>

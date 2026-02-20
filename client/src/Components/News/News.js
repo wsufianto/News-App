@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import NewsList from '../NewsItem/NewsList'
-import { useParams, Redirect } from 'react-router-dom'
+import { useParams, Navigate } from 'react-router-dom'
 import { country } from '../../Helpers/CountryCode'
 import axios from 'axios'
 import * as api from '../../api/index'
-require('dotenv').config();
 
 const News = () => {
 
@@ -93,7 +92,7 @@ const News = () => {
   }
 
   if (!validRegion) {
-    return <Redirect to="/*" />
+    return <Navigate to="/*" />
   }  
 
   return (

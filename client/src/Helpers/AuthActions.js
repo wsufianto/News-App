@@ -4,7 +4,7 @@ export const signin = async ({dispatch, payload}) => {
   try {
     const { data } = await api.signIn(payload.formData)
 
-    payload.history.push("/")
+    payload.navigate("/")
     
     return dispatch({ 
       type: 'LOGIN', payload: data
@@ -19,7 +19,7 @@ export const signin = async ({dispatch, payload}) => {
 export const signup = async ({dispatch, payload}) => {
   try {
     const { data } = await api.signUp(payload.formData)
-    payload.history.push("/")
+    payload.navigate("/")
     
     return dispatch({ 
       type: 'LOGIN', payload: data

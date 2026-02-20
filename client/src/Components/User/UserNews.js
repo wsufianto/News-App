@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import NewsList from '../NewsItem/NewsList'
 import * as api from '../../api/index'
-import { useParams, Redirect } from 'react-router-dom'
+import { useParams, Navigate } from 'react-router-dom'
 
 const UserNews = () => {
 
@@ -54,7 +54,7 @@ const UserNews = () => {
   }, [userId])
 
   if (!user || user === null) {
-    return <Redirect to="/" />
+    return <Navigate to="/" />
   }
 
   const username = `${user.result.firstName} ${user.result.lastName}`
@@ -74,7 +74,7 @@ const UserNews = () => {
       <div className="flex justify-center items-center">
         <h1 className="text-3xl py-3 px-3 text-blue-600"> Saved News </h1>
       </div>
-      {userId !== user.result._id ? <Redirect to="/*" /> :
+      {userId !== user.result._id ? <Navigate to="/*" /> :
       data.length === 0 && !isLoading? <div className="text-red-500 py-5">No News Found</div> :
         <NewsList items={data} title={`${username}'s News`} isLoading={isLoading} errMessage={errMessage} handleClick={handleDelete} label={buttonLabel} />}
       {(errMessage !== '') && <div className="text-red-500">{errMessage} </div>}
