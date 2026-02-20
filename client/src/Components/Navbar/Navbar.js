@@ -1,33 +1,33 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Link, useHistory, useLocation } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { AuthContext } from '../../App' // import authentication context
 import HomeIcon from '../../Icons/HomeIcon.js'
 import ContactIcon from '../../Icons/ContactIcon.js'
 import LoginIcon from '../../Icons/LoginIcon.js'
 import LogoutIcon from '../../Icons/LogoutIcon.js'
 import NewsIcon from '../../Icons/NewsIcon.js'
-import decode from 'jwt-decode'
+import { jwtDecode } from 'jwt-decode'
 
 const Navbar = () => {
   const { dispatch } = React.useContext(AuthContext); // useContext to get reducer dispatch function 
   
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')))
   
-  const history = useHistory()
+  const navigate = useNavigate()
   const location = useLocation()
 
   const handleLogout = useCallback(() => {
     dispatch({ type: 'LOGOUT' })
-    history.push("/")
+    navigate("/")
     setUser(null)
-  },[dispatch, history, setUser])
+  },[dispatch, navigate, setUser])
   
   const token = user?.token
 
   useEffect(() => {
     
     if(token) {
-      const decodedToken = decode(token)
+      const decodedToken = jwtDecode(token)
       if (decodedToken.exp * 1000 < new Date().getTime()) handleLogout()
     }
 
